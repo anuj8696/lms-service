@@ -24,4 +24,9 @@ public class OrderDetailsController {
     public ResponseEntity<?> getIssueBook(@PathVariable String regNo){
        return new ResponseEntity<> (orderDetailsService.getIssueBook(regNo),HttpStatus.OK);
     }
+
+    @PostMapping(value="/returnBooks")
+    public ResponseEntity<?> returnBooks(@RequestBody OrderDetailsRequest orderDetailsRequest){
+        return new ResponseEntity<> (orderDetailsService.returnBooks(orderDetailsRequest),HttpStatus.OK);
+    }
 }

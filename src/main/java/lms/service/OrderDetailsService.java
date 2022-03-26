@@ -2,6 +2,7 @@ package lms.service;
 
 import lms.dto.request.OrderDetailsRequest;
 import lms.dto.response.MessageResponse;
+import lms.dto.response.OrderedBookForAStudentResponse;
 import lms.model.Book;
 import lms.model.OrderDetails;
 import lms.repository.OrderDetailsRepo;
@@ -19,6 +20,9 @@ public class OrderDetailsService {
     @Autowired
     private OrderDetailsRepo orderDetailsRepository;
 
+    @Autowired
+    private BookService bookService;
+
     public MessageResponse issueBoook(OrderDetailsRequest orderDetailsRequest) {
         MessageResponse messageResponse = new MessageResponse();
         Date date = new Date();
@@ -30,22 +34,39 @@ public class OrderDetailsService {
         orderDetails.setReturnDate(null);
         orderDetailsRepository.save(orderDetails);
     }
-        messageResponse.setMessage("Successfully issues the books");
+        messageResponse.setMessage("Successfully issued the books");
         messageResponse.setStatus(200);
         return messageResponse;
 }
 
-    public List<OrderDetails> getIssueBook(String regNo){
+    public List<OrderedBookForAStudentResponse> getIssueBook(String regNo){
         List<OrderDetails> order=  orderDetailsRepository.findOrderByRegNo(regNo);
-//        List<OrderDetails> ordered=new ArrayList<>();
-//        for(OrderDetails orderDetails:order){
-//           String bookId= orderDetails.getBookId();
-//            Book book=new Book();
-//            if(bookId.equals(book.getBookId())){
-//                ordered.add(book.getBookName());
-//                ordered.add(book.getAuthor());
-//            }
-//        }
-        return order;
+        List<OrderedBookForAStudentResponse> orderedResponse=new ArrayList<>();
+        for(OrderDetails orderDetails:order){
+            OrderedBookForAStudentResponse orderedBookForAStudentResponse = new OrderedBookForAStudentResponse();
+            Book book = bookService.findByBookId(orderDetails.getBookId());
+            orderedBookForAStudentResponse.setBookId(book.getBookId());
+            orderedBookForAStudentResponse.setBookName(book.getBookName());
+            orderedBookForAStudentResponse.setBookAuthor(book.getAuthor());
+            orderedBookForAStudentResponse.setOrderdDate(orderDetails.getIssuedDate().toString());
+            orderedResponse.add(orderedBookForAStudentResponse);
+        }
+        return orderedResponse;
+    }
+
+    public MessageResponse returnBooks(OrderDetailsRequest orderDetailsRequest) {
+        MessageResponse messageResponse = new MessageResponse();
+        Date date = new Date();
+        //List<OrderDetails> order=  orderDetailsRepository.findOrderByRegNo(orderDetailsRequest.getRegNo());
+        for(String bookId: orderDetailsRequest.getBookId()) {
+            OrderDetails orderDetails = new OrderDetails();
+            orderDetails.setRegNo((orderDetailsRequest.getRegNo()));
+            orderDetails.setBookId(bookId);
+            orderDetails.setReturnDate(date);
+            orderDetailsRepository.save(orderDetails);
+        }
+        messageResponse.setMessage("Successfully returned the books");
+        messageResponse.setStatus(200);
+        return messageResponse;
     }
 }

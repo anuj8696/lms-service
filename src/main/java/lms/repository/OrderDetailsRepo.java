@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface OrderDetailsRepo extends JpaRepository<OrderDetails, String> {
 
-    @Query(value = "select * from order_details where reg_no = ?1", nativeQuery = true)
+    @Query(value = "select * from order_details where reg_no = ?1 and return_date is null", nativeQuery = true)
     public List<OrderDetails> findOrderByRegNo(String regNo);
 }
