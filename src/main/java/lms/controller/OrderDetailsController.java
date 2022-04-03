@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://nit-jsr-lms-service.herokuapp.com")
 public class OrderDetailsController {
 
     @Autowired
